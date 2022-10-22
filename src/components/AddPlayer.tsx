@@ -70,29 +70,30 @@ function Addplayer({ playerCards, setPlayerCards }: AddPlayerProps) {
         setPlayerCount(playerCount + 1);
     };
 
+    const handleUpdatePlayer = (e: [], index: number) => {
+        let arrCopy = [...playerCards];
+        arrCopy[index] = {
+            player: index + 1,
+            hand: [...e],
+        };
+        setPlayerCards(arrCopy);
+    };
+
     return (
         <>
             <div className="playersGrid">
                 {playerCards.map((player, index) => {
                     return (
-                        <div className="player">
+                        <div className="player" key={player.player}>
                             <p>player: {player.player}</p>
                             <MultiSelect
                                 data={cardData}
-                                label="Community Cards"
+                                label="Player hand"
                                 placeholder="Select your community cards"
                                 searchable
                                 nothingFound="Nothing found"
                                 maxSelectedValues={2}
-                                onChange={(string) =>
-                                    setPlayerCards([
-                                        (playerCards[index] = {
-                                            player: index + 1,
-                                            hand: [...string],
-                                        }),
-                                    ])
-                                }
-                                // onChange={() => console.log(playerCards[index])}
+                                onChange={(e) => handleUpdatePlayer(e, index)}
                                 clearable
                             />
                         </div>

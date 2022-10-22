@@ -13,7 +13,6 @@ function App() {
     ]);
 
     console.log({ playerCards });
-    console.log(communityCards);
     return (
         <div className="App">
             <CommunitySelect setCommunityCards={setCommunityCards} />
