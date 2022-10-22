@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { MultiSelect } from "@mantine/core";
 
+interface Player {
+    player: number;
+    hand: string[];
+}
+
 type AddPlayerProps = {
-    setPlayerCards: React.Dispatch<React.SetStateAction<object[]>>;
-    playerCards: [{ player: number; hand: string[] }];
+    setPlayerCards: React.Dispatch<React.SetStateAction<Player[]>>;
+    playerCards: Player[];
 };
 
 const cardData = [
@@ -70,7 +75,7 @@ function Addplayer({ playerCards, setPlayerCards }: AddPlayerProps) {
         setPlayerCount(playerCount + 1);
     };
 
-    const handleUpdatePlayer = (e: [], index: number) => {
+    const handleUpdatePlayer = (e: string[], index: number) => {
         let arrCopy = [...playerCards];
         arrCopy[index] = {
             player: index + 1,

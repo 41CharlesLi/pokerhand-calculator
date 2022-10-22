@@ -2,9 +2,13 @@ import CommunitySelect from "./components/CommunitySelect";
 import { useState } from "react";
 import Addplayer from "./components/Addplayer";
 
+interface Player {
+    player: number;
+    hand: string[];
+}
 function App() {
     const [communityCards, setCommunityCards] = useState<string[]>([]);
-    const [playerCards, setPlayerCards] = useState<object[]>([
+    const [playerCards, setPlayerCards] = useState<Player[]>([
         {
             player: 1,
             hand: [],
@@ -12,7 +16,6 @@ function App() {
         { player: 2, hand: [] },
     ]);
 
-    console.log({ playerCards });
     return (
         <div className="App">
             <CommunitySelect setCommunityCards={setCommunityCards} />
