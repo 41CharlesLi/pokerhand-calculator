@@ -76,7 +76,7 @@ function App() {
         { player: 2, hand: [] },
     ]);
     const [cardDeck, setCardDeck] = useState<Card[]>(cardData);
-    console.log(communityCards);
+
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
@@ -88,6 +88,8 @@ function App() {
             <Addplayer
                 playerCards={playerCards}
                 setPlayerCards={setPlayerCards}
+                cardDeck={cardDeck}
+                setCardDeck={setCardDeck}
             />
         </div>
     );

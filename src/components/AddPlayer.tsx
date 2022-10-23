@@ -6,9 +6,17 @@ interface Player {
     hand: string[];
 }
 
+interface Card {
+    value: string;
+    label: string;
+    player: string;
+}
+
 type AddPlayerProps = {
     setPlayerCards: React.Dispatch<React.SetStateAction<Player[]>>;
     playerCards: Player[];
+    cardDeck: Card[];
+    setCardDeck: React.Dispatch<React.SetStateAction<Card[]>>;
 };
 
 const cardData = [
@@ -66,7 +74,12 @@ const cardData = [
     { value: "2D", label: "2 of Diamonds" },
 ];
 
-function Addplayer({ playerCards, setPlayerCards }: AddPlayerProps) {
+function Addplayer({
+    playerCards,
+    setPlayerCards,
+    cardDeck,
+    setCardDeck,
+}: AddPlayerProps) {
     const [hands, setHands] = useState<object>({});
     const [playerCount, setPlayerCount] = useState<number>(3);
 
@@ -75,14 +88,48 @@ function Addplayer({ playerCards, setPlayerCards }: AddPlayerProps) {
         setPlayerCount(playerCount + 1);
     };
 
-    const handleUpdatePlayer = (e: string[], index: number) => {
+    // const handleUpdatePlayer = (e: string[], index: number) => {
+    //     let arrCopy = [...playerCards];
+    //     arrCopy[index] = {
+    //         player: index + 1,
+    //         hand: [...e],
+    //     };
+    //     setPlayerCards(arrCopy);
+    // };
+
+    const handleCardSelect = (
+        selectedArray: string[],
+        index: number,
+        cardDeck: Card[],
+        player: number
+    ) => {
         let arrCopy = [...playerCards];
         arrCopy[index] = {
             player: index + 1,
-            hand: [...e],
+            hand: [...selectedArray],
         };
         setPlayerCards(arrCopy);
+        // we map over cardDeck, if the value matches the card selected, we add a string of "community"
+        // else, we change to empty string
+        const cardMap = cardDeck.map((card) => {
+            if (selectedArray.includes(card.value)) {
+                card.player = `player${player}`;
+            } else {
+                // removes selected card from cardMap
+                card.player = "";
+            }
+            return card;
+        });
+
+        setCardDeck(cardMap);
+        console.log({ cardDeck });
     };
+
+    const availableCards = (player: number) =>
+        cardDeck.filter((card) => {
+            // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
+            return card.player !== (`player${player}` || "");
+        });
 
     return (
         <>
@@ -92,13 +139,20 @@ function Addplayer({ playerCards, setPlayerCards }: AddPlayerProps) {
                         <div className="player" key={player.player}>
                             <p>player: {player.player}</p>
                             <MultiSelect
-                                data={cardData}
+                                data={availableCards(player.player)}
                                 label="Player hand"
                                 placeholder="Select your community cards"
                                 searchable
                                 nothingFound="Nothing found"
                                 maxSelectedValues={2}
-                                onChange={(e) => handleUpdatePlayer(e, index)}
+                                onChange={(selectedArray) =>
+                                    handleCardSelect(
+                                        selectedArray,
+                                        index,
+                                        cardDeck,
+                                        player.player
+                                    )
+                                }
                                 clearable
                             />
                         </div>
