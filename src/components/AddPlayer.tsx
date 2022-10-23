@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MultiSelect } from "@mantine/core";
 
 interface Player {
@@ -82,20 +82,13 @@ function Addplayer({
 }: AddPlayerProps) {
     const [hands, setHands] = useState<object>({});
     const [playerCount, setPlayerCount] = useState<number>(3);
+    const [currentDeck, setCurrentDeck] = useState<Card[]>(cardDeck);
 
+    console.log(currentDeck);
     const addNewPlayer = () => {
         setPlayerCards([...playerCards, { player: playerCount, hand: [] }]);
         setPlayerCount(playerCount + 1);
     };
-
-    // const handleUpdatePlayer = (e: string[], index: number) => {
-    //     let arrCopy = [...playerCards];
-    //     arrCopy[index] = {
-    //         player: index + 1,
-    //         hand: [...e],
-    //     };
-    //     setPlayerCards(arrCopy);
-    // };
 
     const handleCardSelect = (
         selectedArray: string[],
@@ -113,33 +106,45 @@ function Addplayer({
         // else, we change to empty string
         const cardMap = cardDeck.map((card) => {
             if (selectedArray.includes(card.value)) {
-                card.player = `player${player}`;
+                card.player = `player${index + 1}`;
             } else {
                 // removes selected card from cardMap
                 card.player = "";
             }
             return card;
         });
-
         setCardDeck(cardMap);
-        console.log({ cardDeck });
+        setCurrentDeck(
+            cardDeck.filter((card) => {
+                // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
+                return card.player !== (`player${player}` || "");
+            })
+        );
     };
 
-    const availableCards = (player: number) =>
-        cardDeck.filter((card) => {
-            // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
-            return card.player !== (`player${player}` || "");
-        });
+    // const availableCards = (player: number) =>
+    //     cardDeck.filter((card) => {
+    //         // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
+    //         return card.player != (`player${player}` || "");
+    //     });
 
+    const availableCards = (player: number) =>
+        setCurrentDeck(
+            cardDeck.filter((card) => {
+                // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
+                return card.player !== (`player${player}` || "");
+            })
+        );
     return (
         <>
             <div className="playersGrid">
                 {playerCards.map((player, index) => {
+                    //cards are being removed from the wrong player, cards are not showing in the multiselect
                     return (
                         <div className="player" key={player.player}>
                             <p>player: {player.player}</p>
                             <MultiSelect
-                                data={availableCards(player.player)}
+                                data={currentDeck}
                                 label="Player hand"
                                 placeholder="Select your community cards"
                                 searchable
