@@ -80,23 +80,8 @@ function Addplayer({
     cardDeck,
     setCardDeck,
 }: AddPlayerProps) {
-    const [hands, setHands] = useState<object>({});
     const [playerCount, setPlayerCount] = useState<number>(3);
     const [currentDeck, setCurrentDeck] = useState<Card[]>(cardDeck);
-
-    useEffect(() => {
-        const filteredDeck = cardDeck.filter((card) => {
-            // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
-
-            if (card.player !== "community" || card.player.length === 0) {
-                return card;
-            }
-        });
-
-        setCurrentDeck(filteredDeck);
-        console.log("firing");
-        console.log(currentDeck);
-    }, [cardDeck]);
 
     const addNewPlayer = () => {
         setPlayerCards([...playerCards, { player: playerCount, hand: [] }]);
@@ -106,6 +91,7 @@ function Addplayer({
     const handleCardSelect = (
         selectedArray: string[],
         index: number,
+        cardDeck: Card[],
         currentDeck: Card[],
         player: number
     ) => {
@@ -115,49 +101,24 @@ function Addplayer({
             hand: [...selectedArray],
         };
         setPlayerCards(arrCopy);
-        // we map over cardDeck, if the value matches the card selected, we add a string of "community"
-        // else, we change to empty string
-        const cardMap = currentDeck.map((card) => {
+
+        const cardMap = cardDeck.map((card) => {
             if (selectedArray.includes(card.value)) {
-                card.player = `player${index + 1}`;
-            } else if (card.player !== "" || card.player.length !== 0) {
-                return card;
-            } else {
-                // removes selected card from cardMap
-                card.player = "";
+                card.player = `player${player}`;
             }
             return card;
         });
         setCardDeck(cardMap);
-        setCurrentDeck(
-            cardDeck.filter((card) => {
-                // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
-                return card.player !== (`player${player}` || "" || "community");
-            })
-        );
     };
 
-    // const availableCards = (player: number) =>
-    //     cardDeck.filter((card) => {
-    //         // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
-    //         return card.player != (`player${player}` || "");
-    //     });
-
-    // const availableCards = (player: number) =>
-    //     setCurrentDeck(
-    //         cardDeck.filter((card) => {
-    //             // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
-    //             return card.player !== (`player${player}` || "");
-    //         })
-    //     );
-    const availableCards = cardDeck.filter((card) => {
-        // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
-        return card.player !== ("commmunity" || "");
-    });
-
     useEffect(() => {
-        setHands({});
-    }, [cardDeck, currentDeck]);
+        setCurrentDeck(
+            cardDeck.filter((card) => {
+                return card.player === "";
+            })
+        );
+    }, [cardDeck]);
+
     return (
         <>
             <div className="playersGrid">
@@ -177,6 +138,7 @@ function Addplayer({
                                     handleCardSelect(
                                         selectedArray,
                                         index,
+                                        cardDeck,
                                         currentDeck,
                                         player.player
                                     )
