@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MultiSelect } from "@mantine/core";
 
 interface Card {
@@ -18,27 +18,39 @@ function CommunitySelect({
     cardDeck,
     setCardDeck,
 }: CommunitySelectProps) {
-    const handleCardSelect = (cardDeck: Card[], cards: string[]) => {
-        // we map over cardDeck, if the value matches the card selected, we add a string of "community"
-        // else, we change to empty string
+    const [communityCardValues, setCommunityCardValues] = useState<string[]>(
+        []
+    );
+
+    const handleCardSelect = (cardDeck: Card[], selectedArray: string[]) => {
         const cardMap = cardDeck.map((card) => {
-            if (cards.includes(card.value)) {
+            //map over cardDeck. If our communitycardValues includes the value already, remove it
+            if (communityCardValues.includes(card.value)) {
+                communityCardValues.filter((element) => element !== card.value);
+            }
+
+            // if the cardDeck includes the value being added, add a player value of "community"
+            if (selectedArray.includes(card.value)) {
                 card.player = "community";
-            } else {
-                // removes selected card from cardMap
+            } else if (card.player === "community") {
                 card.player = "";
             }
             return card;
         });
-
+        setCommunityCardValues([...selectedArray]);
         setCardDeck(cardMap);
-        setCommunityCards([...cards]);
     };
+
+    // whenever communityCardValues change, update communityCard state in parent
+    useEffect(() => {
+        setCommunityCards(communityCardValues);
+    }, [communityCardValues]);
 
     const availableCards = cardDeck.filter((card) => {
         // only show cards that are labelled as community or empty string. SOOO "player 1" will not show
         return card.player !== ("commmunity" || "");
     });
+
     return (
         <MultiSelect
             data={availableCards}
@@ -51,6 +63,7 @@ function CommunitySelect({
             onChange={(selectedArray) =>
                 handleCardSelect(cardDeck, selectedArray)
             }
+            value={communityCardValues}
         />
     );
 }

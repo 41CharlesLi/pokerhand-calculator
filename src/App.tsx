@@ -76,7 +76,9 @@ function App() {
         { player: 2, hand: [] },
     ]);
     const [cardDeck, setCardDeck] = useState<Card[]>(cardData);
-
+    useEffect(() => {
+        console.log(cardDeck);
+    }, [cardDeck]);
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
