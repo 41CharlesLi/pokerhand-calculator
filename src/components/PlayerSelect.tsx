@@ -10,6 +10,7 @@ interface Card {
     value: string;
     label: string;
     player: string;
+    disabled?: boolean;
 }
 
 type AddPlayerProps = {
@@ -17,6 +18,7 @@ type AddPlayerProps = {
     playerCards: Player[];
     cardDeck: Card[];
     setCardDeck: React.Dispatch<React.SetStateAction<Card[]>>;
+    index: number;
 };
 
 const cardData = [
@@ -74,86 +76,41 @@ const cardData = [
     { value: "2D", label: "2 of Diamonds" },
 ];
 
-function Addplayer({
-    playerCards,
-    setPlayerCards,
-    cardDeck,
-    setCardDeck,
-}: AddPlayerProps) {
-    const [playerCount, setPlayerCount] = useState<number>(3);
-    const [currentDeck, setCurrentDeck] = useState<Card[]>(cardDeck);
+function PlayerSelect({ cardDeck, index, setCardDeck }: AddPlayerProps) {
+    const [hand, setHand] = useState<string[]>([]);
 
-    const addNewPlayer = () => {
-        setPlayerCards([...playerCards, { player: playerCount, hand: [] }]);
-        setPlayerCount(playerCount + 1);
+    const handleCardSelect = (selectedArray: string[]) => {
+        setHand([...selectedArray]);
     };
-
-    const handleCardSelect = (
-        selectedArray: string[],
-        index: number,
-        cardDeck: Card[],
-        currentDeck: Card[],
-        player: number
-    ) => {
-        let arrCopy = [...playerCards];
-        arrCopy[index] = {
-            player: index + 1,
-            hand: [...selectedArray],
-        };
-        setPlayerCards(arrCopy);
-
+    useEffect(() => {
         const cardMap = cardDeck.map((card) => {
-            if (selectedArray.includes(card.value)) {
-                card.player = `player${player}`;
+            if (hand.includes(card.value)) {
+                card["disabled"] = true;
             }
             return card;
         });
         setCardDeck(cardMap);
-    };
-
-    useEffect(() => {
-        setCurrentDeck(
-            cardDeck.filter((card) => {
-                return card.player === "";
-            })
-        );
-    }, [cardDeck]);
-
+    }, [hand]);
     return (
         <>
-            <div className="playersGrid">
-                {playerCards.map((player, index) => {
-                    //cards are being removed from the wrong player, cards are not showing in the multiselect
-                    return (
-                        <div className="player" key={player.player}>
-                            <p>player: {player.player}</p>
-                            <MultiSelect
-                                data={currentDeck}
-                                label="Player hand"
-                                placeholder="Select your community cards"
-                                searchable
-                                nothingFound="Nothing found"
-                                maxSelectedValues={2}
-                                onChange={(selectedArray) =>
-                                    handleCardSelect(
-                                        selectedArray,
-                                        index,
-                                        cardDeck,
-                                        currentDeck,
-                                        player.player
-                                    )
-                                }
-                                clearable
-                            />
-                        </div>
-                    );
-                })}
+            <div className="player">
+                <p>player: {index + 1}</p>
+                <MultiSelect
+                    data={cardDeck}
+                    label="Player hand"
+                    placeholder="Select your community cards"
+                    searchable
+                    nothingFound="Nothing found"
+                    maxSelectedValues={2}
+                    onChange={(selectedArray) =>
+                        handleCardSelect(selectedArray)
+                    }
+                    value={hand}
+                    clearable
+                />
             </div>
-            {playerCards.length <= 8 && (
-                <button onClick={() => addNewPlayer()}>Add Player</button>
-            )}
         </>
     );
 }
 
-export default Addplayer;
+export default PlayerSelect;

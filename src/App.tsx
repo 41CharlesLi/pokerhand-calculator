@@ -1,6 +1,6 @@
 import CommunitySelect from "./components/CommunitySelect";
 import { useState, useEffect } from "react";
-import Addplayer from "./components/Addplayer";
+import PlayerSelect from "./components/PlayerSelect";
 
 interface Player {
     player: number;
@@ -76,9 +76,13 @@ function App() {
         { player: 2, hand: [] },
     ]);
     const [cardDeck, setCardDeck] = useState<Card[]>(cardData);
-    useEffect(() => {
-        console.log(cardDeck);
-    }, [cardDeck]);
+    const [playerCount, setPlayerCount] = useState<number>(3);
+
+    const addNewPlayer = () => {
+        setPlayerCards([...playerCards, { player: playerCount, hand: [] }]);
+        setPlayerCount(playerCount + 1);
+    };
+
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
@@ -87,12 +91,18 @@ function App() {
                 cardDeck={cardDeck}
                 setCardDeck={setCardDeck}
             />
-            <Addplayer
-                playerCards={playerCards}
-                setPlayerCards={setPlayerCards}
-                cardDeck={cardDeck}
-                setCardDeck={setCardDeck}
-            />
+            {playerCards.map((playerCard, index) => {
+                return (
+                    <PlayerSelect
+                        cardDeck={cardDeck}
+                        index={index}
+                        setCardDeck={setCardDeck}
+                    />
+                );
+            })}
+            {playerCards.length <= 8 && (
+                <button onClick={() => addNewPlayer()}>Add Player</button>
+            )}
         </div>
     );
 }
