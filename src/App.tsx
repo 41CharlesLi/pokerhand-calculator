@@ -175,13 +175,6 @@ function App() {
             />
             (
             <MultiSelect
-                onDropdownOpen={() => {
-                    cardDeck.filter((card) => {
-                        return (
-                            card.selected !== true || card.player === "player1"
-                        );
-                    });
-                }}
                 data={cardDeck.filter((card) => {
                     return card.selected !== true || card.player === "player1";
                 })}
@@ -197,13 +190,6 @@ function App() {
                 clearable
             />
             <MultiSelect
-                onDropdownOpen={() => {
-                    cardDeck.filter((card) => {
-                        return (
-                            card.selected !== true || card.player === "player2"
-                        );
-                    });
-                }}
                 data={cardDeck.filter((card) => {
                     return card.selected !== true || card.player === "player2";
                 })}
