@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 import { MultiSelect } from "@mantine/core";
 import PlayerSelect from "./components/PlayerSelect";
 
-// interface Player {
-//     player: number;
-//     hand: string[];
-// }
 interface Card {
     value: string;
     label: string;
@@ -77,18 +73,13 @@ interface Card {
 function App() {
     const [cardDeck, setCardDeck] = useState<Card[]>(cardData);
     const [communityCards, setCommunityCards] = useState<string[]>([]);
-    const [playerOne, setPlayerOne] = useState<string[]>([]);
-    const [playerTwo, setPlayerTwo] = useState<string[]>([]);
-    const [playerCount, setPlayerCount] = useState<number>(2);
+    const [playerCount, setPlayerCount] = useState<number>(3);
     const [players, setPlayers] = useState<object[]>([
         {
             player1: [],
         },
         {
             player2: [],
-        },
-        {
-            player3: [],
         },
     ]);
 
@@ -112,64 +103,15 @@ function App() {
         setCardDeck(cardDeckCopy);
     }, [communityCards]);
 
-    useEffect(() => {
-        let cardDeckCopy = [...cardDeck];
-        cardDeckCopy.map((card) => {
-            if (playerOne.includes(card.value)) {
-                card.selected = true;
-                card.player = "player1";
-            }
-            if (card.player === "player1" && !playerOne.includes(card.value)) {
-                card.selected = false;
-                card.player = "";
-            }
-        });
-
-        setCardDeck(cardDeckCopy);
-    }, [playerOne]);
-
-    useEffect(() => {
-        for (let i = 0; i < players.length; i++) {
-            for (let key in players[i]) {
-                console.log(key);
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        let cardDeckCopy = [...cardDeck];
-        cardDeckCopy.map((card) => {
-            if (playerTwo.includes(card.value)) {
-                card.selected = true;
-                card.player = "player2";
-            }
-
-            if (card.player === "player2" && !playerTwo.includes(card.value)) {
-                card.selected = false;
-                card.player = "";
-            }
-        });
-        setCardDeck(cardDeckCopy);
-    }, [playerTwo]);
-
-    // component needs to know the player being changed
-    // component needs the card deck
-    //component useEffect takes playerProp to change cardDeck
-
     const handleCommunitySelect = (selectedArray: string[]) => {
         setCommunityCards([...selectedArray]);
     };
 
-    const handlePlayerOne = (selectedArray: string[]) => {
-        setPlayerOne([...selectedArray]);
-    };
-    const handlePlayerTwo = (selectedArray: string[]) => {
-        setPlayerTwo([...selectedArray]);
-    };
     const addPlayer = () => {
-        if (playerCount === 9) {
+        if (playerCount === 10) {
             return;
         }
+        setPlayers([...players, { [`player${playerCount}`]: [] }]);
         setPlayerCount(playerCount + 1);
     };
 
@@ -194,42 +136,19 @@ function App() {
                 clearable
             />
 
-            <MultiSelect
-                data={cardDeck.filter((card) => {
-                    return card.selected !== true || card.player === "player1";
-                })}
-                label="Player 1"
-                placeholder="Select your hand"
-                searchable
-                nothingFound="Nothing found"
-                maxSelectedValues={2}
-                onChange={(selectedArray) => {
-                    handlePlayerOne(selectedArray);
-                }}
-                value={playerOne}
-                clearable
-            />
-            <MultiSelect
-                data={cardDeck.filter((card) => {
-                    return card.selected !== true || card.player === "player2";
-                })}
-                label="Player 2"
-                placeholder="Select your hand"
-                searchable
-                nothingFound="Nothing found"
-                maxSelectedValues={2}
-                onChange={(selectedArray) => {
-                    handlePlayerTwo(selectedArray);
-                }}
-                value={playerTwo}
-                clearable
-            />
-            <PlayerSelect
-                cardDeck={cardDeck}
-                currentPlayer={`player3`}
-                players={players}
-                setPlayers={setPlayers}
-            />
+            {players.map((player, index) => {
+                return (
+                    <PlayerSelect
+                        cardDeck={cardDeck}
+                        setCardDeck={setCardDeck}
+                        currentPlayer={`player${index + 1}`}
+                        players={players}
+                        setPlayers={setPlayers}
+                        key={index}
+                    />
+                );
+            })}
+
             <button onClick={() => addPlayer()}>Add Player</button>
         </div>
     );
