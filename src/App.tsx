@@ -1,12 +1,11 @@
-import CommunitySelect from "./components/CommunitySelect";
 import { useState, useEffect } from "react";
-import PlayerSelect from "./components/PlayerSelect";
 import { MultiSelect } from "@mantine/core";
+import PlayerSelect from "./components/PlayerSelect";
 
-interface Player {
-    player: number;
-    hand: string[];
-}
+// interface Player {
+//     player: number;
+//     hand: string[];
+// }
 interface Card {
     value: string;
     label: string;
@@ -80,8 +79,21 @@ function App() {
     const [communityCards, setCommunityCards] = useState<string[]>([]);
     const [playerOne, setPlayerOne] = useState<string[]>([]);
     const [playerTwo, setPlayerTwo] = useState<string[]>([]);
+    const [playerCount, setPlayerCount] = useState<number>(2);
+    const [players, setPlayers] = useState<object[]>([
+        {
+            player1: [],
+        },
+        {
+            player2: [],
+        },
+        {
+            player3: [],
+        },
+    ]);
 
     useEffect(() => {
+        //when communityCards state changes, look through the cardDeck. If the card matches a value in community state, mark it as selected and set the player to 'community'
         let cardDeckCopy = [...cardDeck];
         cardDeckCopy.map((card) => {
             if (communityCards.includes(card.value)) {
@@ -89,6 +101,7 @@ function App() {
                 card.player = "community";
             }
             if (
+                // if the card is already marked as 'community' but the community state does not include the value, set selected to false and set player to empty string
                 card.player === "community" &&
                 !communityCards.includes(card.value)
             ) {
@@ -116,6 +129,14 @@ function App() {
     }, [playerOne]);
 
     useEffect(() => {
+        for (let i = 0; i < players.length; i++) {
+            for (let key in players[i]) {
+                console.log(key);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
         let cardDeckCopy = [...cardDeck];
         cardDeckCopy.map((card) => {
             if (playerTwo.includes(card.value)) {
@@ -131,28 +152,27 @@ function App() {
         setCardDeck(cardDeckCopy);
     }, [playerTwo]);
 
-    const handleCommunitySelect = (selectedArray: string[]) => {
-        // let cardDeckCopy = [...cardDeck];
+    // component needs to know the player being changed
+    // component needs the card deck
+    //component useEffect takes playerProp to change cardDeck
 
-        // setCardDeck(cardDeckCopy);
-        // console.log([...selectedArray]);
+    const handleCommunitySelect = (selectedArray: string[]) => {
         setCommunityCards([...selectedArray]);
     };
 
     const handlePlayerOne = (selectedArray: string[]) => {
-        // let cardDeckCopy = [...cardDeck];
-
-        // setCardDeck(cardDeckCopy);
         setPlayerOne([...selectedArray]);
     };
     const handlePlayerTwo = (selectedArray: string[]) => {
-        // let cardDeckCopy = [...cardDeck];
-
-        // setCardDeck(cardDeckCopy);
         setPlayerTwo([...selectedArray]);
     };
+    const addPlayer = () => {
+        if (playerCount === 9) {
+            return;
+        }
+        setPlayerCount(playerCount + 1);
+    };
 
-    let availableCards = cardDeck;
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
@@ -173,7 +193,7 @@ function App() {
                 value={communityCards}
                 clearable
             />
-            (
+
             <MultiSelect
                 data={cardDeck.filter((card) => {
                     return card.selected !== true || card.player === "player1";
@@ -204,7 +224,13 @@ function App() {
                 value={playerTwo}
                 clearable
             />
-            )
+            <PlayerSelect
+                cardDeck={cardDeck}
+                currentPlayer={`player3`}
+                players={players}
+                setPlayers={setPlayers}
+            />
+            <button onClick={() => addPlayer()}>Add Player</button>
         </div>
     );
 }
