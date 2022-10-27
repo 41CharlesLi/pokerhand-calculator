@@ -141,7 +141,7 @@ function App() {
                     <PlayerSelect
                         cardDeck={cardDeck}
                         setCardDeck={setCardDeck}
-                        currentPlayer={`player${index + 1}`}
+                        currentPlayer={`player ${index + 1}`}
                         players={players}
                         setPlayers={setPlayers}
                         key={index}
