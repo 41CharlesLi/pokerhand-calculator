@@ -13,6 +13,7 @@ type PlayerSelectProps = {
     currentPlayer: string;
     players: object[];
     setPlayers: React.Dispatch<React.SetStateAction<object[]>>;
+    required: boolean;
 };
 
 function PlayerSelect({
@@ -21,6 +22,7 @@ function PlayerSelect({
     currentPlayer,
     players,
     setPlayers,
+    required,
 }: PlayerSelectProps) {
     const [hand, setHand] = useState<string[]>([]);
     useEffect(() => {
@@ -28,16 +30,16 @@ function PlayerSelect({
         //         loop over the array and if theres a key in the objects that matches the current player
         //         set their hand to the selectedArray
         //         setPlayers to arrCopy
-        let arrCopy = [...players];
-        for (let i = 0; i < arrCopy.length; i++) {
-            for (let key in arrCopy[i]) {
-                if (key === currentPlayer) {
-                    let obj = { [`${currentPlayer}`]: [hand] };
-                    arrCopy[i] = { [`${currentPlayer}`]: [...hand] };
-                }
-            }
-        }
-        setPlayers(arrCopy);
+        // let arrCopy = [...players];
+        // for (let i = 0; i < arrCopy.length; i++) {
+        //     for (let key in arrCopy[i]) {
+        //         if (key === currentPlayer) {
+        //             let obj = { [`${currentPlayer}`]: [hand] };
+        //             arrCopy[i] = { [`${currentPlayer}`]: [...hand] };
+        //         }
+        //     }
+        // }
+        // setPlayers(arrCopy);
 
         // create cardDeckcopy and loop
         // if handState includes card.value, set cardselected property to true and card.player to current player
@@ -55,7 +57,23 @@ function PlayerSelect({
         });
 
         setCardDeck(cardDeckCopy);
+
+        //   copy the players state
+        //         loop over the array and if theres a key in the objects that matches the current player
+        //         set their hand to the selectedArray
+        //         setPlayers to arrCopy
+        let arrCopy = [...players];
+        for (let i = 0; i < arrCopy.length; i++) {
+            for (let key in arrCopy[i]) {
+                if (key === currentPlayer) {
+                    arrCopy[i] = { [`${currentPlayer}`]: [...hand] };
+                }
+            }
+        }
+        setPlayers(arrCopy);
     }, [hand]);
+
+    useEffect(() => {}, [hand]);
 
     const handleSelect = (selectedArray: string[]) => {
         setHand(selectedArray);
@@ -76,6 +94,7 @@ function PlayerSelect({
             }}
             value={hand}
             clearable
+            required={required}
         />
     );
 }

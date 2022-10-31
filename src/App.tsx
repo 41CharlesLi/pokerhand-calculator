@@ -76,12 +76,23 @@ function App() {
     const [playerCount, setPlayerCount] = useState<number>(3);
     const [players, setPlayers] = useState<object[]>([
         {
-            player1: [],
+            "player 1": [],
         },
         {
-            player2: [],
+            "player 2": [],
         },
     ]);
+    const [fetchUrl, setFetchUrl] = useState<string>("");
+
+    useEffect(() => {
+        let communitySearchValue = `cc=${communityCards.toString()}`;
+        players.forEach((player) => {
+            for (let key in player) {
+                console.log({ player });
+            }
+        });
+        console.log(communitySearchValue);
+    }, [players, communityCards]);
 
     useEffect(() => {
         //when communityCards state changes, look through the cardDeck. If the card matches a value in community state, mark it as selected and set the player to 'community'
@@ -111,13 +122,17 @@ function App() {
         if (playerCount === 10) {
             return;
         }
-        setPlayers([...players, { [`player${playerCount}`]: [] }]);
+        setPlayers([...players, { [`player ${playerCount}`]: [] }]);
         setPlayerCount(playerCount + 1);
     };
 
+    const calculateWinner = (e) => {
+        e.preventDefault();
+    };
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
+            {/* <form onSubmit={(e) => calculateWinner(e)}> */}
             <MultiSelect
                 data={cardDeck.filter((card) => {
                     return (
@@ -134,8 +149,8 @@ function App() {
                 }}
                 value={communityCards}
                 clearable
+                required={true}
             />
-
             {players.map((player, index) => {
                 return (
                     <PlayerSelect
@@ -144,10 +159,14 @@ function App() {
                         currentPlayer={`player ${index + 1}`}
                         players={players}
                         setPlayers={setPlayers}
+                        required={true}
+                        // think about key
                         key={index}
                     />
                 );
             })}
+            <button>Calculate Winner</button>
+            {/* </form> */}
 
             <button onClick={() => addPlayer()}>Add Player</button>
         </div>
