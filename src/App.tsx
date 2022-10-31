@@ -187,6 +187,7 @@ function App() {
         setPlayers(tempPlayers);
         setPlayerCount(playerCount - 1);
     };
+
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
@@ -238,7 +239,7 @@ function App() {
                 )}
                 <button>Calculate Winner</button>
             </form>
-            {playerCount >= 4 && (
+            {playerCount >= 4 && winners.length === 0 && (
                 <button
                     onClick={() => {
                         removePlayer();
