@@ -135,7 +135,8 @@ function App() {
         setCommunityCards([...selectedArray]);
     };
 
-    const addPlayer = () => {
+    const addPlayer = (e) => {
+        e.preventDefault();
         if (playerCount === 10) {
             return;
         }
@@ -221,10 +222,15 @@ function App() {
                         </>
                     );
                 })}
+                {winners.length === 0 && (
+                    <button onClick={(e) => addPlayer(e)}>Add Player</button>
+                )}
+                {winners.length !== 0 && (
+                    <button onClick={() => location.reload()}>New Hand</button>
+                )}
                 <button>Calculate Winner</button>
             </form>
 
-            <button onClick={() => addPlayer()}>Add Player</button>
             {winners &&
                 winners.map((winner) => {
                     return <p>Player {winner} is the winner</p>;
