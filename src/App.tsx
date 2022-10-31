@@ -107,10 +107,8 @@ function App() {
             ).toString()}`;
             playersSearchValue += indPlayerSearchValue;
         });
-
+        console.log(playersSearchValue);
         setFetchUrl((url += communitySearchValue += playersSearchValue));
-
-        console.log(fetchUrl);
     }, [players, communityCards]);
 
     useEffect(() => {
@@ -145,12 +143,22 @@ function App() {
         setPlayerCount(playerCount + 1);
     };
 
-    const calculateWinner = (e) => {
+    const calculateWinner = (e: React.SyntheticEvent) => {
         e.preventDefault();
+        for (let key in players) {
+            let array = Object.values(players[key]);
+            if (array[0].length !== 2 || communityCards.length !== 5) {
+                alert("make sure you inputted all card values");
+                return;
+            }
+        }
         fetch(fetchUrl)
             .then((response) => response.json())
             .then((results) => {
                 setHandResults(results);
+            })
+            .catch((err) => {
+                console.log(err);
             });
     };
 
@@ -168,7 +176,6 @@ function App() {
         setWinners(prevWinners);
     }, [handResults]);
 
-    console.log(winners);
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
