@@ -70,6 +70,17 @@ interface Card {
     selected: boolean;
 }
 
+interface indResult {
+    cards: string;
+    hand: string;
+    result: string;
+}
+
+interface resultsObject {
+    winners: indResult[];
+    players: indResult[];
+}
+
 function App() {
     const [cardDeck, setCardDeck] = useState<Card[]>(cardData);
     const [communityCards, setCommunityCards] = useState<string[]>([]);
@@ -83,15 +94,23 @@ function App() {
         },
     ]);
     const [fetchUrl, setFetchUrl] = useState<string>("");
+    const [handResults, setHandResults] = useState<resultsObject>();
+    const [winners, setWinners] = useState<string[]>([]);
 
     useEffect(() => {
+        let url = "https://api.pokerapi.dev/v1/winner/texas_holdem?";
         let communitySearchValue = `cc=${communityCards.toString()}`;
+        let playersSearchValue = "";
         players.forEach((player) => {
-            for (let key in player) {
-                console.log({ player });
-            }
+            let indPlayerSearchValue = `&pc[]=${Object.values(
+                player
+            ).toString()}`;
+            playersSearchValue += indPlayerSearchValue;
         });
-        console.log(communitySearchValue);
+
+        setFetchUrl((url += communitySearchValue += playersSearchValue));
+
+        console.log(fetchUrl);
     }, [players, communityCards]);
 
     useEffect(() => {
@@ -128,47 +147,81 @@ function App() {
 
     const calculateWinner = (e) => {
         e.preventDefault();
+        fetch(fetchUrl)
+            .then((response) => response.json())
+            .then((results) => {
+                setHandResults(results);
+            });
     };
+
+    useEffect(() => {
+        let prevWinners: string[] = [];
+        if (handResults) {
+            handResults.winners.map((winner) => {
+                handResults.players.map((player, index) => {
+                    if (player.cards === winner.cards) {
+                        prevWinners.push(`${index + 1}`);
+                    }
+                });
+            });
+        }
+        setWinners(prevWinners);
+    }, [handResults]);
+
+    console.log(winners);
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
-            {/* <form onSubmit={(e) => calculateWinner(e)}> */}
-            <MultiSelect
-                data={cardDeck.filter((card) => {
+            <form onSubmit={(e) => calculateWinner(e)}>
+                <MultiSelect
+                    data={cardDeck.filter((card) => {
+                        return (
+                            card.selected !== true ||
+                            card.player === "community"
+                        );
+                    })}
+                    label="Community Cards"
+                    placeholder="Select your community cards"
+                    searchable
+                    nothingFound="Nothing found"
+                    maxSelectedValues={5}
+                    onChange={(selectedArray) => {
+                        handleCommunitySelect(selectedArray);
+                    }}
+                    value={communityCards}
+                    clearable
+                    required={true}
+                />
+                {players.map((player, index) => {
                     return (
-                        card.selected !== true || card.player === "community"
+                        <>
+                            <PlayerSelect
+                                cardDeck={cardDeck}
+                                setCardDeck={setCardDeck}
+                                currentPlayer={`player ${index + 1}`}
+                                players={players}
+                                setPlayers={setPlayers}
+                                required={true}
+                                // think about key
+                                key={index}
+                            />
+
+                            {handResults && (
+                                <p>
+                                    Hand: {handResults["players"][index].result}
+                                </p>
+                            )}
+                        </>
                     );
                 })}
-                label="Community Cards"
-                placeholder="Select your community cards"
-                searchable
-                nothingFound="Nothing found"
-                maxSelectedValues={5}
-                onChange={(selectedArray) => {
-                    handleCommunitySelect(selectedArray);
-                }}
-                value={communityCards}
-                clearable
-                required={true}
-            />
-            {players.map((player, index) => {
-                return (
-                    <PlayerSelect
-                        cardDeck={cardDeck}
-                        setCardDeck={setCardDeck}
-                        currentPlayer={`player ${index + 1}`}
-                        players={players}
-                        setPlayers={setPlayers}
-                        required={true}
-                        // think about key
-                        key={index}
-                    />
-                );
-            })}
-            <button>Calculate Winner</button>
-            {/* </form> */}
+                <button>Calculate Winner</button>
+            </form>
 
             <button onClick={() => addPlayer()}>Add Player</button>
+            {winners &&
+                winners.map((winner) => {
+                    return <p>Player {winner} is the winner</p>;
+                })}
         </div>
     );
 }
