@@ -101,13 +101,15 @@ function App() {
         let url = "https://api.pokerapi.dev/v1/winner/texas_holdem?";
         let communitySearchValue = `cc=${communityCards.toString()}`;
         let playersSearchValue = "";
+
+        //whenever players and communityCards changes, set the fetchURL
         players.forEach((player) => {
             let indPlayerSearchValue = `&pc[]=${Object.values(
                 player
             ).toString()}`;
             playersSearchValue += indPlayerSearchValue;
         });
-        console.log(playersSearchValue);
+
         setFetchUrl((url += communitySearchValue += playersSearchValue));
     }, [players, communityCards]);
 
@@ -135,7 +137,7 @@ function App() {
         setCommunityCards([...selectedArray]);
     };
 
-    const addPlayer = (e) => {
+    const addPlayer = (e: React.SyntheticEvent) => {
         e.preventDefault();
         if (playerCount === 10) {
             return;
@@ -147,6 +149,7 @@ function App() {
     const calculateWinner = (e: React.SyntheticEvent) => {
         e.preventDefault();
         for (let key in players) {
+            // if each players doesn't have 2 cards in their hands, or the communityCard state doesn't have 5 cards, alert the user and return
             let array = Object.values(players[key]);
             if (array[0].length !== 2 || communityCards.length !== 5) {
                 alert("make sure you inputted all card values");
@@ -166,6 +169,7 @@ function App() {
     useEffect(() => {
         let prevWinners: string[] = [];
         if (handResults) {
+            // when handResults change, set the Winners state
             handResults.winners.map((winner) => {
                 handResults.players.map((player, index) => {
                     if (player.cards === winner.cards) {
@@ -177,6 +181,12 @@ function App() {
         setWinners(prevWinners);
     }, [handResults]);
 
+    const removePlayer = () => {
+        let tempPlayers = [...players];
+        tempPlayers.pop();
+        setPlayers(tempPlayers);
+        setPlayerCount(playerCount - 1);
+    };
     return (
         <div className="App">
             <h1>Poker Hand Calculator</h1>
@@ -202,7 +212,7 @@ function App() {
                 />
                 {players.map((player, index) => {
                     return (
-                        <>
+                        <div key={index}>
                             <PlayerSelect
                                 cardDeck={cardDeck}
                                 setCardDeck={setCardDeck}
@@ -210,8 +220,6 @@ function App() {
                                 players={players}
                                 setPlayers={setPlayers}
                                 required={true}
-                                // think about key
-                                key={index}
                             />
 
                             {handResults && (
@@ -219,10 +227,10 @@ function App() {
                                     Hand: {handResults["players"][index].result}
                                 </p>
                             )}
-                        </>
+                        </div>
                     );
                 })}
-                {winners.length === 0 && (
+                {winners.length === 0 && playerCount !== 10 && (
                     <button onClick={(e) => addPlayer(e)}>Add Player</button>
                 )}
                 {winners.length !== 0 && (
@@ -230,10 +238,19 @@ function App() {
                 )}
                 <button>Calculate Winner</button>
             </form>
+            {playerCount >= 4 && (
+                <button
+                    onClick={() => {
+                        removePlayer();
+                    }}
+                >
+                    Remove Player
+                </button>
+            )}
 
             {winners &&
                 winners.map((winner) => {
-                    return <p>Player {winner} is the winner</p>;
+                    return <p key={winner}>Player {winner} is the winner</p>;
                 })}
         </div>
     );
