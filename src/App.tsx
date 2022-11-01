@@ -259,13 +259,23 @@ function App() {
                         )}
                         <button>Calculate Winner</button>
                     </form>
-                    <div className="resultsContainer">
+                    <div
+                        className={
+                            winners.length === 0
+                                ? "resultsContainer"
+                                : "resultsContainer show"
+                        }
+                    >
+                        <h2>Results:</h2>
+
                         {winners &&
                             winners.map((winner) => {
                                 return (
-                                    <p key={winner}>
-                                        Player {winner} is the winner
-                                    </p>
+                                    <>
+                                        <p key={winner}>
+                                            Player {winner} is the winner
+                                        </p>
+                                    </>
                                 );
                             })}
                     </div>
