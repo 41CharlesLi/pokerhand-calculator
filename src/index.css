@@ -397,6 +397,11 @@ p {
     flex-direction: column;
 }
 
+.addRemoveBtnContainer {
+    display: flex;
+    gap: 25px;
+}
+
 .playerInput,
 .communityInput {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -430,7 +435,7 @@ form {
 button {
     border-color: purple;
     border: 0;
-    border-radius: 10%;
+    border-radius: 10px;
     color: purple;
     position: relative;
     overflow: hidden;

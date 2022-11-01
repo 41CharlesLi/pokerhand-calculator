@@ -89,7 +89,7 @@ function PlayerSelect({
                 className="playerInput"
             />
             <p>
-                {currentPlayer}: {handResults?.replaceAll("_", " ")}
+                {currentPlayer}'s hand: {handResults?.replaceAll("_", " ")}
             </p>
         </div>
     );
