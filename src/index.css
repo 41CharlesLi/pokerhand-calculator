@@ -187,3 +187,78 @@ template {
 [hidden] {
     display: none;
 }
+
+.main {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.playerContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.playerInput,
+.communityInput {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin: 5px;
+}
+.playerInput {
+    min-width: 375px;
+}
+
+.playerInputs {
+    width: 90vw;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    justify-content: center;
+}
+.mantine-ittua2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+button {
+    border-color: purple;
+    border: 0;
+    border-radius: 10%;
+    color: purple;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: color 150ms ease-in-out;
+    height: 50px;
+    width: 125px;
+    font-weight: bold;
+    background-color: white;
+}
+button::after {
+    content: "";
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 100%;
+    background: purple;
+    z-index: -1;
+    transition: width 150ms ease-in-out;
+}
+
+button:hover {
+    color: #fff;
+}
+button:hover::after {
+    width: 110%;
+}

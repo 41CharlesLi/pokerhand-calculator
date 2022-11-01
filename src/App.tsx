@@ -181,7 +181,8 @@ function App() {
         setWinners(prevWinners);
     }, [handResults]);
 
-    const removePlayer = () => {
+    const removePlayer = (e: React.SyntheticEvent) => {
+        e.preventDefault();
         let tempPlayers = [...players];
         tempPlayers.pop();
         setPlayers(tempPlayers);
@@ -190,69 +191,86 @@ function App() {
 
     return (
         <div className="App">
-            <h1>Poker Hand Calculator</h1>
-            <form onSubmit={(e) => calculateWinner(e)}>
-                <MultiSelect
-                    data={cardDeck.filter((card) => {
-                        return (
-                            card.selected !== true ||
-                            card.player === "community"
-                        );
-                    })}
-                    label="Community Cards"
-                    placeholder="Select your community cards"
-                    searchable
-                    nothingFound="Nothing found"
-                    maxSelectedValues={5}
-                    onChange={(selectedArray) => {
-                        handleCommunitySelect(selectedArray);
-                    }}
-                    value={communityCards}
-                    clearable
-                    required={true}
-                />
-                {players.map((player, index) => {
-                    return (
-                        <div key={index}>
-                            <PlayerSelect
-                                cardDeck={cardDeck}
-                                setCardDeck={setCardDeck}
-                                currentPlayer={`player ${index + 1}`}
-                                players={players}
-                                setPlayers={setPlayers}
-                                required={true}
-                            />
+            <div className="wrapper">
+                <div className="main">
+                    <h1>Poker Hand Calculator</h1>
+                    <form onSubmit={(e) => calculateWinner(e)}>
+                        <MultiSelect
+                            data={cardDeck.filter((card) => {
+                                return (
+                                    card.selected !== true ||
+                                    card.player === "community"
+                                );
+                            })}
+                            label="Community Cards"
+                            placeholder="Select your community cards"
+                            searchable
+                            nothingFound="Nothing found"
+                            maxSelectedValues={5}
+                            onChange={(selectedArray) => {
+                                handleCommunitySelect(selectedArray);
+                            }}
+                            value={communityCards}
+                            clearable
+                            required={true}
+                            className="communityInput"
+                        />
+                        <div className="playerInputs">
+                            {players.map((player, index) => {
+                                return (
+                                    <PlayerSelect
+                                        cardDeck={cardDeck}
+                                        setCardDeck={setCardDeck}
+                                        currentPlayer={`player ${index + 1}`}
+                                        players={players}
+                                        setPlayers={setPlayers}
+                                        required={true}
+                                        handResults={
+                                            handResults &&
+                                            handResults["players"][index].result
+                                        }
+                                        key={index}
+                                    />
+                                );
+                            })}
+                        </div>
 
-                            {handResults && (
-                                <p>
-                                    Hand: {handResults["players"][index].result}
-                                </p>
+                        <div className="addRemoveBtnContainer">
+                            {winners.length === 0 && playerCount !== 10 && (
+                                <button onClick={(e) => addPlayer(e)}>
+                                    Add Player
+                                </button>
+                            )}
+                            {playerCount >= 4 && winners.length === 0 && (
+                                <button
+                                    onClick={(e) => {
+                                        removePlayer(e);
+                                    }}
+                                >
+                                    Remove Player
+                                </button>
                             )}
                         </div>
-                    );
-                })}
-                {winners.length === 0 && playerCount !== 10 && (
-                    <button onClick={(e) => addPlayer(e)}>Add Player</button>
-                )}
-                {winners.length !== 0 && (
-                    <button onClick={() => location.reload()}>New Hand</button>
-                )}
-                <button>Calculate Winner</button>
-            </form>
-            {playerCount >= 4 && winners.length === 0 && (
-                <button
-                    onClick={() => {
-                        removePlayer();
-                    }}
-                >
-                    Remove Player
-                </button>
-            )}
 
-            {winners &&
-                winners.map((winner) => {
-                    return <p key={winner}>Player {winner} is the winner</p>;
-                })}
+                        {winners.length !== 0 && (
+                            <button onClick={() => location.reload()}>
+                                New Hand
+                            </button>
+                        )}
+                        <button>Calculate Winner</button>
+                    </form>
+                    <div className="resultsContainer">
+                        {winners &&
+                            winners.map((winner) => {
+                                return (
+                                    <p key={winner}>
+                                        Player {winner} is the winner
+                                    </p>
+                                );
+                            })}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
